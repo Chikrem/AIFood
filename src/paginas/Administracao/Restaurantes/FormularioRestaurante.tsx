@@ -1,18 +1,39 @@
 import { Button, TextField } from "@mui/material";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 const FormularioRestaurante = () => {
 
-const [nomeRestaurante, setNomeRestaurante] = useState<string>("");
+  const parametros = useParams();
 
-const aoSubmeter = (evento: React.FormEvent<HTMLFormElement>) => {
+  useEffect(() => {
+    if (parametros.id) {
+      axios.get(`http://localhost:8000/api/v2/restaurantes/${parametros.id}/`).then((resposta) => {
+        setNomeRestaurante(resposta.data.nome);
+      });
+    }
+  }, [parametros]);
+
+  const [nomeRestaurante, setNomeRestaurante] = useState<string>("");
+
+  const aoSubmeter = (evento: React.FormEvent<HTMLFormElement>) => {
     evento.preventDefault();
-    axios.post('http://localhost:8000/api/v2/restaurantes/', {
+    if (parametros.id) {
+      // Atualiza restaurante existente
+      axios.put(`http://localhost:8000/api/v2/restaurantes/${parametros.id}/`, {
         nome: nomeRestaurante
-    }).then(()=> {
+      }).then(() => {
+        alert('Restaurante atualizado com sucesso');
+      });
+    } else {
+      // Cria novo restaurante
+      axios.post('http://localhost:8000/api/v2/restaurantes/', {
+        nome: nomeRestaurante
+      }).then(() => {
         alert('Restaurante cadastrado com sucesso');
-    })
+      });
+    }
   };
 
   return (
