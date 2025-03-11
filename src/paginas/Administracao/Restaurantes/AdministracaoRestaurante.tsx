@@ -7,25 +7,25 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { useEffect, useState } from "react";
 import IRestaurante from "../../../interfaces/IRestaurante";
-import axios from "axios";
 import { Link } from "react-router-dom";
 import { Button } from "@mui/material";
+import http from "../../../http";
 
 const AdministracaoRestaurantes = () => {
   const [restaurantes, setRestaurantes] = useState<IRestaurante[]>([]);
 
   useEffect(() => {
     //OBETER RESTAURANTES API DE ADMINISTRAÇÃO
-    axios
-      .get<IRestaurante[]>("http://localhost:8000/api/v2/restaurantes/")
+    http
+      .get<IRestaurante[]>("restaurantes/")
       .then((resposta) => setRestaurantes(resposta.data))
 
       .catch((erro) => console.log(erro));
   }, []);
 
   function excluir(restaurante: IRestaurante): void {
-    axios
-      .delete(`http://localhost:8000/api/v2/restaurantes/${restaurante.id}/`)
+    http
+      .delete(`restaurantes/${restaurante.id}/`)
       .then(() => {
         setRestaurantes((prevRestaurantes) =>
           prevRestaurantes.filter((resposta) => resposta.id !== restaurante.id)
