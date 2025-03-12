@@ -11,11 +11,8 @@ import {
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import http from "../../../http";
-import IPrato from "../../../interfaces/IPrato";
-import axios from "axios";
 import ITag from "../../../interfaces/ITag";
 import IRestaurante from "../../../interfaces/IRestaurante";
-import Restaurante from "./../../../componentes/ListaRestaurantes/Restaurante/index";
 
 const FormularioPrato = () => {
   const parametros = useParams();
@@ -49,23 +46,35 @@ const FormularioPrato = () => {
   const aoSubmeterForm = (evento: React.FormEvent<HTMLFormElement>) => {
     evento.preventDefault();
 
-    const pratoData = {
-      nome: nomePrato,
-      tag: tags,
-      imagem: imagem,
-      descricao: descricao,
-      restaurante: restaurantes,
-    };
+    const formData = new FormData();
 
-    if (parametros.id) {
-      http.put(`pratos/${parametros.id}/`, pratoData).then(() => {
-        alert("Prato atualizado com sucesso!");
-      });
-    } else {
-      axios.post("pratos/", pratoData).then(() => {
-        alert("Prato cadastrado com sucesso!");
-      });
+    formData.append('nome', nomePrato)
+    formData.append('descricao', descricao)
+
+    formData.append('tag', tag)
+
+    formData.append('restaurante', restaurante)
+
+    if (imagem) {
+        formData.append('imagem', imagem)
     }
+
+    http.request({
+        url: 'pratos/',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        },
+        data: formData
+    })
+        .then(() => {
+            setNomePrato('')
+            setDescricao('')
+            setTag('')
+            setRestaurante('')
+            alert('Prato cadastrado com sucesso!')
+        })
+        .catch(erro => console.log(erro))
   };
 
   return (
